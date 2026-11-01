@@ -28,18 +28,19 @@ npm run dev          # http://localhost:5173
 
 ### Scripts
 
-| Script                       | What it does                                          |
-| ---------------------------- | ----------------------------------------------------- |
-| `npm run dev`                | Vite dev server with hot reload                       |
-| `npm run build`              | Type-check and build for production into `dist/`      |
-| `npm run preview`            | Serve the production build on http://localhost:4173   |
-| `npm run test`               | Unit and component tests (Vitest), single run         |
-| `npm run test:unit`          | Same, in watch mode                                   |
-| `npm run test:e2e`           | End-to-end tests in Chromium, Firefox and WebKit      |
-| `npm run test:visual`        | Screenshot comparison tests                           |
-| `npm run test:visual:update` | Re-create the screenshot baselines                    |
-| `npm run lint`               | oxlint + ESLint, with auto-fix                        |
-| `npm run format`             | Prettier                                              |
+| Script                       | What it does                                        |
+| ---------------------------- | --------------------------------------------------- |
+| `npm run dev`                | Vite dev server with hot reload                     |
+| `npm run build`              | Type-check and build for production into `dist/`    |
+| `npm run preview`            | Serve the production build on http://localhost:4173 |
+| `npm run test`               | Unit and component tests (Vitest), single run       |
+| `npm run test:unit`          | Same, in watch mode                                 |
+| `npm run test:coverage`      | Unit test coverage report with v8                   |
+| `npm run test:e2e`           | End-to-end tests in Chromium, Firefox and WebKit    |
+| `npm run test:visual`        | Screenshot comparison tests                         |
+| `npm run test:visual:update` | Re-create the screenshot baselines                  |
+| `npm run lint`               | oxlint + ESLint, with auto-fix                      |
+| `npm run format`             | Prettier                                            |
 
 Before the first E2E run, install the browsers once:
 
@@ -118,13 +119,13 @@ finishes, and the next lap starts after the gap.
 
 ## Testing
 
-| Layer                 | Tool                    | Covers                                                                    |
-| --------------------- | ----------------------- | ------------------------------------------------------------------------- |
-| Unit                  | Vitest                  | Generators, schedule rules, speed/progress math, ranking, formatting      |
-| Store                 | Vitest + Pinia          | Status transitions, countdown, lap flow, pause, full program, regenerate  |
-| Component             | Vitest + Vue Test Utils | Lap table rendering, header buttons through Start → Pause → Resume        |
-| End-to-end            | Playwright              | The full user flow in Chromium, Firefox and WebKit                        |
-| Visual                | Playwright screenshots  | Initial, program generated, mid-race (paused) and finished screens        |
+| Layer      | Tool                    | Covers                                                                   |
+| ---------- | ----------------------- | ------------------------------------------------------------------------ |
+| Unit       | Vitest                  | Generators, schedule rules, speed/progress math, ranking, formatting     |
+| Store      | Vitest + Pinia          | Status transitions, countdown, lap flow, pause, full program, regenerate |
+| Component  | Vitest + Vue Test Utils | Lap table rendering, header buttons through Start → Pause → Resume       |
+| End-to-end | Playwright              | The full user flow in Chromium, Firefox and WebKit                       |
+| Visual     | Playwright screenshots  | Initial, program generated, mid-race (paused) and finished screens       |
 
 The E2E and visual tests are deterministic without any test-only code in the app:
 
@@ -135,6 +136,27 @@ The E2E and visual tests are deterministic without any test-only code in the app
 Visual baselines depend on the operating system's font rendering, so they are stored per platform
 (`e2e/visual/snapshots/*-<platform>.png`). CI runs the functional E2E suite. Run the visual
 suite locally, and use `npm run test:visual:update` after an intended UI change.
+
+## Browser support
+
+The application is built on modern web standards:
+
+- **CSS Container Queries** (`container-type: inline-size` & `cqw` units in `RaceTrack.vue`) for dynamic lane-width horse positioning
+- **CSS Custom Properties** (`--p`, `--coat`, `--i`) for zero-allocation animation state
+- **CSS Grid & Flexbox** for responsive 3-column and stacked panel layouts
+- **SVG Animations** with CSS keyframe timing functions
+- **Modern ECMAScript (ES2022+)** and Web APIs (`requestAnimationFrame`, `matchMedia('prefers-reduced-motion')`)
+
+### Supported browsers
+
+| Browser                                           | Minimum Version | Tested in CI                  | Notes                                             |
+| ------------------------------------------------- | --------------- | ----------------------------- | ------------------------------------------------- |
+| **Google Chrome / Chromium** (Edge, Brave, Opera) | Chrome 105+     | Yes (Chromium)                | Full CSS Container Query (`cqw`) support          |
+| **Mozilla Firefox**                               | Firefox 110+    | Yes (Firefox)                 | Full CSS Container Query and SVG keyframe support |
+| **Apple Safari / WebKit** (macOS, iOS)            | Safari 16.0+    | Yes (WebKit)                  | Native CSS Container Query support                |
+| **Mobile Browsers** (Chrome Android, iOS Safari)  | Modern versions | Yes (Mobile/Tablet viewports) | Responsive layout down to 360px viewport width    |
+
+All 3 core rendering engines (Chromium, Firefox, and WebKit) are tested automatically on every pull request and push to `main` via Playwright in the CI pipeline.
 
 ## Build & deploy
 
@@ -155,11 +177,11 @@ The workflow sets `BASE_PATH=/<repo>/` so asset URLs work under the repository s
 
 Import the repository and use:
 
-| Setting           | Value           |
-| ----------------- | --------------- |
-| Build command     | `npm run build` |
-| Output directory  | `dist`          |
-| Node version      | 24              |
+| Setting          | Value           |
+| ---------------- | --------------- |
+| Build command    | `npm run build` |
+| Output directory | `dist`          |
+| Node version     | 24              |
 
 No `BASE_PATH` is needed, since these hosts serve from the root.
 
