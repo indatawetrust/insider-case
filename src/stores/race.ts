@@ -1,10 +1,17 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { COUNTDOWN_MS, LAP_GAP_MS } from '@/constants/game'
-import { RaceStatus, type LaneState, type Lap, type LapResult } from '@/types'
+import {
+  RaceStatus,
+  type LaneState,
+  type Lap,
+  type LapResult,
+  type PersistedRaceState,
+} from '@/types'
 import { lapDuration, progressAt, rankRunners } from '@/utils/race'
 import type { RandomFn } from '@/utils/random'
 import { generateSchedule } from '@/utils/schedule'
+import { loadFromStorage, removeFromStorage, saveToStorage, STORAGE_KEYS } from '@/utils/storage'
 import { useHorsesStore } from './horses'
 
 export type { LaneState }
@@ -22,6 +29,36 @@ export const useRaceStore = defineStore('race', () => {
   const programId = ref(0)
   /** Time since the current lap's gates opened. Negative while the countdown runs. */
   const elapsedMs = ref(0)
+
+  function persistState() {
+    saveToStorage<PersistedRaceState>(STORAGE_KEYS.RACE, {
+      laps: laps.value,
+      results: results.value,
+      status: status.value === RaceStatus.Running ? RaceStatus.Paused : status.value,
+      lapIndex: lapIndex.value,
+      programId: programId.value,
+      elapsedMs: elapsedMs.value,
+    })
+  }
+
+  // Restore saved race if available and matches the stable
+  const cached = loadFromStorage<PersistedRaceState | null>(STORAGE_KEYS.RACE, null)
+  if (cached && Array.isArray(cached.laps) && cached.laps.length > 0) {
+    const valid = cached.laps.every((l) =>
+      l.runners.every((r) => horsesStore.horseById(r.horseId) !== undefined),
+    )
+    if (valid) {
+      laps.value = cached.laps
+      results.value = cached.results ?? []
+      lapIndex.value = Math.min(cached.lapIndex ?? 0, cached.laps.length - 1)
+      programId.value = cached.programId ?? 1
+      elapsedMs.value = cached.elapsedMs ?? 0
+      status.value =
+        cached.status === RaceStatus.Running
+          ? RaceStatus.Paused
+          : (cached.status ?? RaceStatus.Ready)
+    }
+  }
 
   const currentLap = computed<Lap | null>(() =>
     status.value === RaceStatus.Idle ? null : (laps.value[lapIndex.value] ?? null),
@@ -93,19 +130,25 @@ export const useRaceStore = defineStore('race', () => {
     elapsedMs.value = 0
     programId.value++
     status.value = RaceStatus.Ready
+    persistState()
   }
 
   function start() {
     if (status.value === RaceStatus.Ready) {
       elapsedMs.value = -COUNTDOWN_MS
       status.value = RaceStatus.Running
+      persistState()
     } else if (status.value === RaceStatus.Paused) {
       status.value = RaceStatus.Running
+      persistState()
     }
   }
 
   function pause() {
-    if (status.value === RaceStatus.Running) status.value = RaceStatus.Paused
+    if (status.value === RaceStatus.Running) {
+      status.value = RaceStatus.Paused
+      persistState()
+    }
   }
 
   function toggle() {
@@ -127,6 +170,7 @@ export const useRaceStore = defineStore('race', () => {
         distance: lap.distance,
         placements: rankRunners(lap.runners),
       })
+      persistState()
     }
 
     if (elapsedMs.value >= duration + LAP_GAP_MS) {
@@ -136,7 +180,18 @@ export const useRaceStore = defineStore('race', () => {
       } else {
         status.value = RaceStatus.Finished
       }
+      persistState()
     }
+  }
+
+  function reset() {
+    laps.value = []
+    results.value = []
+    status.value = RaceStatus.Idle
+    lapIndex.value = 0
+    elapsedMs.value = 0
+    programId.value = 0
+    removeFromStorage(STORAGE_KEYS.RACE)
   }
 
   return {
@@ -159,5 +214,6 @@ export const useRaceStore = defineStore('race', () => {
     pause,
     toggle,
     tick,
+    reset,
   }
 })

@@ -51,3 +51,12 @@ export interface LaneState {
   /** Finishing position once the horse has crossed the line, otherwise null. */
   position: number | null
 }
+
+export interface PersistedRaceState {
+  laps: Lap[]
+  results: LapResult[]
+  status: RaceStatus
+  lapIndex: number
+  programId: number
+  elapsedMs: number
+}

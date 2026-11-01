@@ -8,6 +8,20 @@ export interface LapRow {
   time?: string
 }
 
+export interface LapTableProps {
+  lapNumber: number
+  distance: number
+  rows: LapRow[]
+  state?: LapState
+  /** Highlights the podium (results view). */
+  podium?: boolean
+}
+
+export interface BasePanelProps {
+  title: string
+  accent: string
+}
+
 export interface HorseIconProps {
   color: string
   size?: number | string
@@ -15,4 +29,3 @@ export interface HorseIconProps {
   height?: number | string
   galloping?: boolean
 }
-

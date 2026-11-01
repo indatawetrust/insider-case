@@ -1,21 +1,20 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { LapRow, LapState } from '@/types'
+import type { LapRow, LapState, LapTableProps } from '@/types'
 import { ordinal } from '@/utils/format'
 import HorseIcon from './HorseIcon.vue'
 
-export type { LapRow, LapState }
+export type { LapRow, LapState, LapTableProps }
 
-const props = defineProps<{
-  lapNumber: number
-  distance: number
-  rows: LapRow[]
-  state?: LapState
-  /** Highlights the podium (results view). */
-  podium?: boolean
-}>()
+const {
+  lapNumber,
+  distance,
+  rows,
+  state = 'upcoming',
+  podium = false,
+} = defineProps<LapTableProps>()
 
-const hasTime = computed(() => props.rows.some((row) => row.time))
+const hasTime = computed(() => rows.some((row) => row.time))
 </script>
 
 <template>

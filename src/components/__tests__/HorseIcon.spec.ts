@@ -50,4 +50,3 @@ describe('HorseIcon', () => {
     expect(style).toContain('height: 30px')
   })
 })
-

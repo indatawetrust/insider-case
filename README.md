@@ -68,16 +68,17 @@ move a clock forward, so pausing is exact and the race logic can be tested witho
 src/
 ├── constants/game.ts        Rules and tuning: counts, distances, speeds, timings
 ├── data/horses.ts           Name and color pools
-├── types/                   Horse, Lap, Runner, LapResult, RaceStatus
+├── types/                   Horse, Lap, Runner, LapResult, RaceStatus, PersistedRaceState
 ├── utils/                   Pure functions, no Vue
 │   ├── random.ts            Seeded PRNG, shuffle, sample
 │   ├── horses.ts            Stable generation
 │   ├── schedule.ts          6-lap program generation
 │   ├── race.ts              Speed, progress curve, lap length, ranking
-│   └── format.ts            Race time and ordinal formatting
+│   ├── format.ts            Race time and ordinal formatting
+│   └── storage.ts           Safe localStorage persistence wrapper
 ├── stores/                  Pinia, setup-style
-│   ├── horses.ts            The stable
-│   └── race.ts              Program, status, race clock, results
+│   ├── horses.ts            The stable (persisted in localStorage)
+│   └── race.ts              Program, status, race clock, results (persisted)
 ├── composables/
 │   ├── useRaceLoop.ts       requestAnimationFrame → race.tick(delta)
 │   └── useScrollIntoView.ts Follows the live lap / newest result
@@ -207,10 +208,11 @@ npm run build
 - **Generate Program** draws a new program from the existing stable instead of re-rolling the horses. It is disabled while a race is running, and allowed while paused or after the last lap. Generating resets the results.
 - **Program positions** are gate (lane) numbers. **Result positions** are finishing places.
 - **Horse names** are computing pioneers, following the example in the brief.
+- **Session persistence**: The stable of 20 horses, generated 6-lap program, completed results, and race clock are persisted in `localStorage`. Reloading or closing the tab preserves the session; mid-race reloads resume cleanly in a paused state.
 
 ## Possible improvements
 
-- Persist the stable and results (e.g. `localStorage`) so a refresh keeps the session.
 - Speed control (1×, 2×, 4×) on top of the existing race clock.
-- Accumulated standings across the 6 laps.
+- Accumulated standings and championship points across the 6 laps.
+- Audio cues (start bell, galloping soundscape, photo-finish horn).
 - Dark theme.

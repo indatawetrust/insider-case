@@ -4,6 +4,7 @@ import { COUNTDOWN_MS, LAP_GAP_MS } from '@/constants/game'
 import { RaceStatus } from '@/types'
 import { lapDuration } from '@/utils/race'
 import { createRandom } from '@/utils/random'
+import { STORAGE_KEYS } from '@/utils/storage'
 import { useRaceStore } from '../race'
 
 /** Advances the clock in frame-sized steps, like the real loop does. */
@@ -19,6 +20,7 @@ describe('race store', () => {
   let store: ReturnType<typeof useRaceStore>
 
   beforeEach(() => {
+    localStorage.clear()
     setActivePinia(createPinia())
     store = useRaceStore()
   })
@@ -102,5 +104,33 @@ describe('race store', () => {
     expect(store.laps).not.toBe(firstProgram)
     expect(store.status).toBe(RaceStatus.Ready)
     expect(store.results).toEqual([])
+  })
+
+  it('persists program to localStorage and restores in Paused state if reloaded while running', () => {
+    store.generateProgram(createRandom(1))
+    store.start()
+    advance(store, COUNTDOWN_MS + 500)
+    expect(store.status).toBe(RaceStatus.Running)
+
+    // Simulate page reload by creating a fresh Pinia instance
+    setActivePinia(createPinia())
+    const rehydratedStore = useRaceStore()
+
+    expect(rehydratedStore.status).toBe(RaceStatus.Paused)
+    expect(rehydratedStore.laps).toHaveLength(6)
+    expect(rehydratedStore.lapIndex).toBe(0)
+    expect(rehydratedStore.lanes).toHaveLength(10)
+    expect(rehydratedStore.canToggle).toBe(true)
+  })
+
+  it('resets state and clears storage on reset()', () => {
+    store.generateProgram(createRandom(1))
+    expect(localStorage.getItem(STORAGE_KEYS.RACE)).toBeTruthy()
+
+    store.reset()
+    expect(store.status).toBe(RaceStatus.Idle)
+    expect(store.laps).toEqual([])
+    expect(store.results).toEqual([])
+    expect(localStorage.getItem(STORAGE_KEYS.RACE)).toBeNull()
   })
 })

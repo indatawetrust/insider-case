@@ -88,3 +88,26 @@ test('generating again while paused starts a fresh program', async ({ page }) =>
   await expect(toggle).toHaveText('Start')
   await expect(page.getByRole('banner')).toContainText('Program ready')
 })
+
+test('persists stable, program and lap results across page reload', async ({ page }) => {
+  const { generate, toggle, programLaps, resultLaps, horseRows } = ui(page)
+  await expect(horseRows).toHaveCount(20)
+  const initialHorseNames = await horseRows.locator('td:first-child').allTextContents()
+
+  await generate.click()
+  await toggle.click()
+  await page.clock.runFor(15_000)
+  await expect(resultLaps).toHaveCount(1)
+
+  // Reload the page
+  await page.reload()
+  await page.evaluate(() => document.fonts.ready)
+
+  // Verify stable is identical
+  await expect(horseRows.locator('td:first-child')).toHaveText(initialHorseNames)
+
+  // Verify program and results are kept, and race is paused
+  await expect(programLaps).toHaveCount(6)
+  await expect(resultLaps).toHaveCount(1)
+  await expect(toggle).toHaveText('Resume')
+})

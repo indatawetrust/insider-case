@@ -1,6 +1,6 @@
 .confetti,
 #__vue-devtools-container__,
-[id*="vue-devtools"],
-[class*="vue-devtools"] {
+[id*='vue-devtools'],
+[class*='vue-devtools'] {
   display: none !important;
 }

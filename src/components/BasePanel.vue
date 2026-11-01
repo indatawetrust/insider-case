@@ -1,5 +1,12 @@
 <script setup lang="ts">
-defineProps<{ title: string; accent: string }>()
+import type { BasePanelProps } from '@/types'
+
+defineProps<BasePanelProps>()
+
+defineSlots<{
+  default?(): unknown
+  meta?(): unknown
+}>()
 </script>
 
 <template>

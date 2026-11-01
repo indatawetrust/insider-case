@@ -4,6 +4,7 @@ import { HORSE_COUNT } from '@/constants/game'
 import type { Horse } from '@/types/horse'
 import { generateHorses } from '@/utils/horses'
 import type { RandomFn } from '@/utils/random'
+import { loadFromStorage, removeFromStorage, saveToStorage, STORAGE_KEYS } from '@/utils/storage'
 
 export const useHorsesStore = defineStore('horses', () => {
   const horses = ref<Horse[]>([])
@@ -12,14 +13,20 @@ export const useHorsesStore = defineStore('horses', () => {
 
   function generate(random: RandomFn = Math.random) {
     horses.value = generateHorses(HORSE_COUNT, random)
+    saveToStorage(STORAGE_KEYS.HORSES, horses.value)
+    removeFromStorage(STORAGE_KEYS.RACE)
   }
 
   function horseById(id: number): Horse | undefined {
     return byId.value.get(id)
   }
 
-  // The stable exists from the first render; the program is what the user generates.
-  generate()
+  const cached = loadFromStorage<Horse[] | null>(STORAGE_KEYS.HORSES, null)
+  if (Array.isArray(cached) && cached.length === HORSE_COUNT) {
+    horses.value = cached
+  } else {
+    generate()
+  }
 
   return { horses, generate, horseById }
 })
