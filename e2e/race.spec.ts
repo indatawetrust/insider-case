@@ -138,3 +138,36 @@ test('toggles sound mute and persists preference', async ({ page }) => {
   await page.reload()
   await expect(audioToggle).toHaveAttribute('aria-label', 'Unmute sounds')
 })
+
+test('displays print button when results exist and triggers print', async ({ page }) => {
+  const { generate, toggle, resultLaps } = ui(page)
+  const printBtn = page.getByTestId('print-results')
+
+  // Initially before any laps finish, print button should not be visible
+  await expect(printBtn).toBeHidden()
+
+  await generate.click()
+  await toggle.click()
+
+  // Wait for 1 lap to finish
+  await page.clock.runFor(15_000)
+  await expect(resultLaps).toHaveCount(1)
+
+  // Print button should now be visible
+  await expect(printBtn).toBeVisible()
+
+  // Mock window.print
+  await page.evaluate(() => {
+    ;(window as unknown as { __printed: boolean }).__printed = false
+    window.print = () => {
+      ;(window as unknown as { __printed: boolean }).__printed = true
+    }
+  })
+
+  await printBtn.click()
+
+  const wasPrinted = await page.evaluate(
+    () => (window as unknown as { __printed: boolean }).__printed,
+  )
+  expect(wasPrinted).toBe(true)
+})

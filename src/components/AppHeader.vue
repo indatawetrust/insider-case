@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { LAP_DISTANCES } from '@/constants/game'
+import { usePwaInstall } from '@/composables/usePwaInstall'
 import { useRaceAudio } from '@/composables/useRaceAudio'
 import { useTheme } from '@/composables/useTheme'
 import { useRaceStore } from '@/stores/race'
@@ -10,6 +11,7 @@ import HorseIcon from './HorseIcon.vue'
 const race = useRaceStore()
 const { isDark, toggleTheme } = useTheme()
 const { muted: isMuted, toggle: toggleAudio } = useRaceAudio()
+const { canInstall, install: installPwa } = usePwaInstall()
 
 const toggleLabel = computed(() => {
   if (race.status === RaceStatus.Running) return 'Pause'
@@ -63,6 +65,23 @@ const segments = computed(() =>
     </div>
 
     <div class="utilities">
+      <button
+        v-if="canInstall"
+        type="button"
+        class="icon-btn"
+        title="Install app"
+        aria-label="Install app"
+        data-testid="pwa-install"
+        @click="installPwa"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"
+            fill="currentColor"
+          />
+        </svg>
+      </button>
+
       <button
         type="button"
         class="icon-btn"

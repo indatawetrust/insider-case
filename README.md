@@ -16,6 +16,8 @@ An interactive horse racing game built with Vue 3, TypeScript and Pinia.
 - **Results:** each lap's finishing order and race time are posted the moment its last horse crosses the line.
 - **Animations:** galloping horses with leg and tail motion, a 3‑2‑1 countdown, live leader, finish-place badges, a winner banner, lap progress in the header, and confetti when the program ends. All decorative motion respects `prefers-reduced-motion`.
 - **Responsive:** three columns on wide screens, stacked panels on tablets and phones.
+- **PWA & Offline:** installable Progressive Web App with service worker offline caching, web manifest, maskable & touch icons, and native install prompt.
+- **Printable results:** one-click print button and paper-optimized `@media print` stylesheet for clean physical printing or PDF export.
 
 ## Getting started
 
@@ -84,7 +86,8 @@ src/
 │   ├── useRaceLoop.ts       requestAnimationFrame → race.tick(delta)
 │   ├── useScrollIntoView.ts Follows the live lap / newest result
 │   ├── useTheme.ts          Reactive dark/light theme composable with system detection
-│   └── useRaceAudio.ts      Coordinates race state with synthesized sound effects
+│   ├── useRaceAudio.ts      Coordinates race state with synthesized sound effects
+│   └── usePwaInstall.ts     PWA install prompt state and action handler
 └── components/
     ├── AppHeader.vue        Title, status, lap meter, Generate / Start-Pause
     ├── HorseList.vue        Horse table
