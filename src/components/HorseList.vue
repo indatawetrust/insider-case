@@ -24,10 +24,10 @@ const inField = computed(
     <table>
       <thead>
         <tr>
-          <th class="num">#</th>
-          <th>Name</th>
-          <th>Condition</th>
-          <th>Color</th>
+          <th scope="col" class="num">#</th>
+          <th scope="col">Name</th>
+          <th scope="col">Condition</th>
+          <th scope="col">Color</th>
         </tr>
       </thead>
       <TransitionGroup tag="tbody" name="row" appear>
@@ -65,8 +65,9 @@ const inField = computed(
 
 <style scoped>
 .meta {
-  color: var(--color-text-muted);
-  font-weight: 600;
+  color: var(--color-text);
+  opacity: 0.85;
+  font-weight: 700;
   font-size: 0.8rem;
 }
 

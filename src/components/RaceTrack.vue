@@ -51,9 +51,9 @@ const CONFETTI = Array.from({ length: 36 }, (_, i) => ({
   <section class="track-panel" data-testid="track" aria-label="Race track">
     <header class="track-header">
       <template v-if="lap">
-        <span class="lap-title">
+        <h2 class="lap-title">
           {{ ordinal(lap.number) }} Lap <span class="distance">{{ lap.distance }}m</span>
-        </span>
+        </h2>
         <span class="lap-count">{{ lap.number }} / {{ LAP_DISTANCES.length }}</span>
         <Transition name="fade" mode="out-in">
           <span v-if="race.leader && race.elapsedMs > 0" :key="race.leader.horse.id" class="leader">
@@ -63,7 +63,7 @@ const CONFETTI = Array.from({ length: 36 }, (_, i) => ({
           </span>
         </Transition>
       </template>
-      <span v-else class="lap-title">Track</span>
+      <h2 v-else class="lap-title">Track</h2>
     </header>
 
     <div class="track" :class="{ racing, paused: race.status === RaceStatus.Paused }">
@@ -197,8 +197,10 @@ const CONFETTI = Array.from({ length: 36 }, (_, i) => ({
 }
 
 .lap-title {
+  margin: 0;
   font-family: var(--font-display);
   font-size: 1.6rem;
+  font-weight: 400;
   letter-spacing: 0.04em;
   line-height: 1;
 }

@@ -1,0 +1,18 @@
+{
+  "specVersion": "1.0",
+  "entries": [
+    {
+      "identifier": "urn:air:local:app:horse-racing",
+      "displayName": "Horse Racing Simulator",
+      "type": "application/json",
+      "description": "Interactive horse racing game with 20 horses, 6 laps, and live results.",
+      "representativeQueries": [
+        "simulate horse race",
+        "generate horse racing program"
+      ],
+      "tags": ["game", "simulation", "horse-racing"],
+      "url": "https://indatawetrust.github.io/insider-case/"
+    }
+  ]
+}
+

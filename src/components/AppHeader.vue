@@ -206,6 +206,11 @@ h1 {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  width: fit-content;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 25%);
+  color: #fff;
   font-weight: 600;
   font-size: 0.85rem;
 }

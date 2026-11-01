@@ -27,9 +27,9 @@ const hasTime = computed(() => rows.some((row) => row.time))
     <table>
       <thead>
         <tr>
-          <th class="pos">Position</th>
-          <th>Name</th>
-          <th v-if="hasTime" class="time">Time</th>
+          <th scope="col" class="pos">Position</th>
+          <th scope="col">Name</th>
+          <th scope="col" v-if="hasTime" class="time">Time</th>
         </tr>
       </thead>
       <tbody>
