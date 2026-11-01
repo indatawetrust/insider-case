@@ -1,16 +1,10 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { Horse } from '@/types/horse'
+import type { LapRow, LapState } from '@/types'
 import { ordinal } from '@/utils/format'
 import HorseIcon from './HorseIcon.vue'
 
-export interface LapRow {
-  position: number
-  horse: Horse
-  time?: string
-}
-
-export type LapState = 'upcoming' | 'active' | 'done'
+export type { LapRow, LapState }
 
 const props = defineProps<{
   lapNumber: number

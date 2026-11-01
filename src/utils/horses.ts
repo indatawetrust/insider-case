@@ -1,7 +1,9 @@
 import { CONDITION_MAX, CONDITION_MIN, HORSE_COUNT } from '@/constants/game'
 import { HORSE_COLORS, HORSE_NAMES } from '@/data/horses'
-import type { Horse } from '@/types/horse'
+import type { ConditionLevel, Horse } from '@/types'
 import { randomInt, sample, type RandomFn } from './random'
+
+export type { ConditionLevel }
 
 export function generateHorses(count = HORSE_COUNT, random: RandomFn = Math.random): Horse[] {
   const names = sample(HORSE_NAMES, count, random)
@@ -14,8 +16,6 @@ export function generateHorses(count = HORSE_COUNT, random: RandomFn = Math.rand
     color: colors[index]!,
   }))
 }
-
-export type ConditionLevel = 'low' | 'mid' | 'high'
 
 export function conditionLevel(condition: number): ConditionLevel {
   if (condition < 34) return 'low'

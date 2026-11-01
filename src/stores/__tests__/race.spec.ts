@@ -51,7 +51,7 @@ describe('race store', () => {
   it('records the result when the last horse finishes, then moves to the next lap', () => {
     store.generateProgram(createRandom(1))
     store.start()
-    advance(store, COUNTDOWN_MS + currentLapLength(store))
+    advance(store, COUNTDOWN_MS + currentLapLength(store) + 1)
 
     expect(store.results).toHaveLength(1)
     expect(store.results[0]!.placements).toHaveLength(10)

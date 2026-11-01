@@ -1,13 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import type { HorseIconProps } from '@/types'
 
-export interface HorseIconProps {
-  color: string
-  size?: number | string
-  width?: number | string
-  height?: number | string
-  galloping?: boolean
-}
+export type { HorseIconProps }
 
 const props = withDefaults(defineProps<HorseIconProps>(), {
   galloping: false,

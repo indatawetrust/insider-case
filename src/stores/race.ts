@@ -1,21 +1,13 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { COUNTDOWN_MS, LAP_GAP_MS } from '@/constants/game'
-import type { Horse } from '@/types/horse'
-import type { Lap, LapResult, RaceStatus } from '@/types/race'
+import type { LaneState, Lap, LapResult, RaceStatus } from '@/types'
 import { lapDuration, progressAt, rankRunners } from '@/utils/race'
 import type { RandomFn } from '@/utils/random'
 import { generateSchedule } from '@/utils/schedule'
 import { useHorsesStore } from './horses'
 
-export interface LaneState {
-  lane: number
-  horse: Horse
-  /** 0–1 share of the distance covered. */
-  progress: number
-  /** Finishing position once the horse has crossed the line, otherwise null. */
-  position: number | null
-}
+export type { LaneState }
 
 const COUNTDOWN_STEPS = 3
 

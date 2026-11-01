@@ -1,4 +1,10 @@
+import type { Horse } from './horse'
+
 export type RaceStatus = 'idle' | 'ready' | 'running' | 'paused' | 'finished'
+
+export type LapDistance = 1200 | 1400 | 1600 | 1800 | 2000 | 2200
+
+export type PodiumPlace = 1 | 2 | 3
 
 /** How a single horse runs one lap. Decided up front, so a lap replays the same way every frame. */
 export interface Runner {
@@ -29,4 +35,13 @@ export interface LapResult {
   lapNumber: number
   distance: number
   placements: Placement[]
+}
+
+export interface LaneState {
+  lane: number
+  horse: Horse
+  /** 0–1 share of the distance covered. */
+  progress: number
+  /** Finishing position once the horse has crossed the line, otherwise null. */
+  position: number | null
 }
