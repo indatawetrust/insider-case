@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { COUNTDOWN_MS, LAP_GAP_MS } from '@/constants/game'
-import type { LaneState, Lap, LapResult, RaceStatus } from '@/types'
+import { RaceStatus, type LaneState, type Lap, type LapResult } from '@/types'
 import { lapDuration, progressAt, rankRunners } from '@/utils/race'
 import type { RandomFn } from '@/utils/random'
 import { generateSchedule } from '@/utils/schedule'
@@ -16,7 +16,7 @@ export const useRaceStore = defineStore('race', () => {
 
   const laps = ref<Lap[]>([])
   const results = ref<LapResult[]>([])
-  const status = ref<RaceStatus>('idle')
+  const status = ref<RaceStatus>(RaceStatus.Idle)
   const lapIndex = ref(0)
   /** Bumped on every new program, so views can replay their entrance animations. */
   const programId = ref(0)
@@ -24,7 +24,7 @@ export const useRaceStore = defineStore('race', () => {
   const elapsedMs = ref(0)
 
   const currentLap = computed<Lap | null>(() =>
-    status.value === 'idle' ? null : (laps.value[lapIndex.value] ?? null),
+    status.value === RaceStatus.Idle ? null : (laps.value[lapIndex.value] ?? null),
   )
 
   const currentLapDuration = computed(() =>
@@ -80,8 +80,10 @@ export const useRaceStore = defineStore('race', () => {
     return best
   })
 
-  const canGenerate = computed(() => status.value !== 'running')
-  const canToggle = computed(() => ['ready', 'running', 'paused'].includes(status.value))
+  const canGenerate = computed(() => status.value !== RaceStatus.Running)
+  const canToggle = computed(() =>
+    [RaceStatus.Ready, RaceStatus.Running, RaceStatus.Paused].includes(status.value),
+  )
 
   function generateProgram(random: RandomFn = Math.random) {
     if (!canGenerate.value) return
@@ -90,31 +92,31 @@ export const useRaceStore = defineStore('race', () => {
     lapIndex.value = 0
     elapsedMs.value = 0
     programId.value++
-    status.value = 'ready'
+    status.value = RaceStatus.Ready
   }
 
   function start() {
-    if (status.value === 'ready') {
+    if (status.value === RaceStatus.Ready) {
       elapsedMs.value = -COUNTDOWN_MS
-      status.value = 'running'
-    } else if (status.value === 'paused') {
-      status.value = 'running'
+      status.value = RaceStatus.Running
+    } else if (status.value === RaceStatus.Paused) {
+      status.value = RaceStatus.Running
     }
   }
 
   function pause() {
-    if (status.value === 'running') status.value = 'paused'
+    if (status.value === RaceStatus.Running) status.value = RaceStatus.Paused
   }
 
   function toggle() {
-    if (status.value === 'running') pause()
+    if (status.value === RaceStatus.Running) pause()
     else start()
   }
 
   /** Advances the race clock. Called once per animation frame while running. */
   function tick(deltaMs: number) {
     const lap = currentLap.value
-    if (status.value !== 'running' || !lap) return
+    if (status.value !== RaceStatus.Running || !lap) return
 
     elapsedMs.value += deltaMs
     const duration = currentLapDuration.value
@@ -132,7 +134,7 @@ export const useRaceStore = defineStore('race', () => {
         lapIndex.value++
         elapsedMs.value = -COUNTDOWN_MS
       } else {
-        status.value = 'finished'
+        status.value = RaceStatus.Finished
       }
     }
   }

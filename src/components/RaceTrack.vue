@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { LAP_DISTANCES } from '@/constants/game'
 import { useRaceStore } from '@/stores/race'
+import { RaceStatus } from '@/types'
 import { formatRaceTime, ordinal } from '@/utils/format'
 import HorseIcon from './HorseIcon.vue'
 
@@ -12,10 +13,12 @@ const MARKERS = [0.25, 0.5, 0.75]
 const GO_MS = 600
 
 const lap = computed(() => race.currentLap)
-const racing = computed(() => race.status === 'running' && race.countdown === 0)
+const racing = computed(() => race.status === RaceStatus.Running && race.countdown === 0)
 const showGo = computed(
   () =>
-    ['running', 'paused'].includes(race.status) && race.elapsedMs >= 0 && race.elapsedMs < GO_MS,
+    [RaceStatus.Running, RaceStatus.Paused].includes(race.status) &&
+    race.elapsedMs >= 0 &&
+    race.elapsedMs < GO_MS,
 )
 const markers = computed(() =>
   lap.value ? MARKERS.map((share) => ({ share, meters: lap.value!.distance * share })) : [],
@@ -56,7 +59,7 @@ const CONFETTI = Array.from({ length: 36 }, (_, i) => ({
       <span v-else class="lap-title">Track</span>
     </header>
 
-    <div class="track" :class="{ racing, paused: race.status === 'paused' }">
+    <div class="track" :class="{ racing, paused: race.status === RaceStatus.Paused }">
       <Transition name="lap-swap" mode="out-in">
         <div v-if="lap" :key="`${race.programId}-${lap.number}`" class="lanes">
           <div class="markers" aria-hidden="true">
@@ -136,7 +139,7 @@ const CONFETTI = Array.from({ length: 36 }, (_, i) => ({
         </div>
       </Transition>
 
-      <div v-if="race.status === 'finished'" class="confetti" aria-hidden="true">
+      <div v-if="race.status === RaceStatus.Finished" class="confetti" aria-hidden="true">
         <span
           v-for="(piece, i) in CONFETTI"
           :key="i"

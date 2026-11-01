@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia, type Pinia } from 'pinia'
 import { useRaceStore } from '@/stores/race'
+import { RaceStatus } from '@/types'
 import AppHeader from '../AppHeader.vue'
 
 describe('AppHeader', () => {
@@ -39,6 +40,6 @@ describe('AppHeader', () => {
 
     await toggle.trigger('click')
     expect(toggle.text()).toBe('Resume')
-    expect(useRaceStore().status).toBe('paused')
+    expect(useRaceStore().status).toBe(RaceStatus.Paused)
   })
 })

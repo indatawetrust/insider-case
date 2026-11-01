@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import { COUNTDOWN_MS, LAP_GAP_MS } from '@/constants/game'
+import { RaceStatus } from '@/types'
 import { lapDuration } from '@/utils/race'
 import { createRandom } from '@/utils/random'
 import { useRaceStore } from '../race'
@@ -23,15 +24,15 @@ describe('race store', () => {
   })
 
   it('starts idle with nothing to start', () => {
-    expect(store.status).toBe('idle')
+    expect(store.status).toBe(RaceStatus.Idle)
     expect(store.canToggle).toBe(false)
     store.start()
-    expect(store.status).toBe('idle')
+    expect(store.status).toBe(RaceStatus.Idle)
   })
 
   it('generates a 6-lap program and becomes ready', () => {
     store.generateProgram(createRandom(1))
-    expect(store.status).toBe('ready')
+    expect(store.status).toBe(RaceStatus.Ready)
     expect(store.laps).toHaveLength(6)
     expect(store.currentLap?.number).toBe(1)
     expect(store.lanes).toHaveLength(10)
@@ -71,19 +72,19 @@ describe('race store', () => {
 
     const before = store.lanes.map((lane) => lane.progress)
     advance(store, 5000)
-    expect(store.status).toBe('paused')
+    expect(store.status).toBe(RaceStatus.Paused)
     expect(store.lanes.map((lane) => lane.progress)).toEqual(before)
 
     store.toggle()
-    expect(store.status).toBe('running')
+    expect(store.status).toBe(RaceStatus.Running)
   })
 
   it('finishes after all 6 laps with one result per lap', () => {
     store.generateProgram(createRandom(1))
     store.start()
-    while (store.status === 'running') advance(store, 1000, 50)
+    while (store.status === RaceStatus.Running) advance(store, 1000, 50)
 
-    expect(store.status).toBe('finished')
+    expect(store.status).toBe(RaceStatus.Finished)
     expect(store.results.map((r) => r.distance)).toEqual([1200, 1400, 1600, 1800, 2000, 2200])
     expect(store.canToggle).toBe(false)
   })
@@ -99,7 +100,7 @@ describe('race store', () => {
     store.pause()
     store.generateProgram(createRandom(2))
     expect(store.laps).not.toBe(firstProgram)
-    expect(store.status).toBe('ready')
+    expect(store.status).toBe(RaceStatus.Ready)
     expect(store.results).toEqual([])
   })
 })

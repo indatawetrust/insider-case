@@ -1,6 +1,7 @@
 import { onBeforeUnmount, watch } from 'vue'
 import { MAX_FRAME_MS } from '@/constants/game'
 import { useRaceStore } from '@/stores/race'
+import { RaceStatus } from '@/types'
 
 /**
  * Drives the race clock with requestAnimationFrame while the race is running.
@@ -23,7 +24,7 @@ export function useRaceLoop() {
   }
 
   watch(
-    () => race.status === 'running',
+    () => race.status === RaceStatus.Running,
     (running) => {
       stop()
       if (running) frame = requestAnimationFrame(step)

@@ -1,6 +1,12 @@
 import type { Horse } from './horse'
 
-export type RaceStatus = 'idle' | 'ready' | 'running' | 'paused' | 'finished'
+export enum RaceStatus {
+  Idle = 'idle',
+  Ready = 'ready',
+  Running = 'running',
+  Paused = 'paused',
+  Finished = 'finished',
+}
 
 export type LapDistance = 1200 | 1400 | 1600 | 1800 | 2000 | 2200
 

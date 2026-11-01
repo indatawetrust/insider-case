@@ -2,24 +2,25 @@
 import { computed } from 'vue'
 import { LAP_DISTANCES } from '@/constants/game'
 import { useRaceStore } from '@/stores/race'
+import { RaceStatus } from '@/types'
 import HorseIcon from './HorseIcon.vue'
 
 const race = useRaceStore()
 
 const toggleLabel = computed(() => {
-  if (race.status === 'running') return 'Pause'
-  if (race.status === 'paused') return 'Resume'
+  if (race.status === RaceStatus.Running) return 'Pause'
+  if (race.status === RaceStatus.Paused) return 'Resume'
   return 'Start'
 })
 
 const statusText = computed(() => {
   const lap = race.currentLap
   switch (race.status) {
-    case 'idle':
+    case RaceStatus.Idle:
       return 'Generate a program to begin'
-    case 'ready':
+    case RaceStatus.Ready:
       return `Program ready · ${LAP_DISTANCES.length} laps`
-    case 'finished':
+    case RaceStatus.Finished:
       return 'All laps complete'
     default:
       return lap ? `Lap ${lap.number} of ${LAP_DISTANCES.length} · ${lap.distance}m` : ''
@@ -30,7 +31,7 @@ const statusText = computed(() => {
 const segments = computed(() =>
   LAP_DISTANCES.map((_, index) => {
     if (index < race.results.length) return 1
-    if (index === race.lapIndex && ['running', 'paused'].includes(race.status)) {
+    if (index === race.lapIndex && [RaceStatus.Running, RaceStatus.Paused].includes(race.status)) {
       return race.lapProgress
     }
     return 0
@@ -47,7 +48,7 @@ const segments = computed(() =>
 
     <div class="status">
       <span class="status-text" aria-live="polite">
-        <span v-if="race.status === 'paused'" class="paused-dot" aria-hidden="true"></span>
+        <span v-if="race.status === RaceStatus.Paused" class="paused-dot" aria-hidden="true"></span>
         {{ statusText }}
       </span>
       <div class="meter" aria-hidden="true">
@@ -72,7 +73,7 @@ const segments = computed(() =>
         :disabled="!race.canToggle"
         @click="race.toggle()"
       >
-        <span class="toggle-icon" :class="race.status === 'running' ? 'pause' : 'play'">
+        <span class="toggle-icon" :class="race.status === RaceStatus.Running ? 'pause' : 'play'">
           <span></span><span></span>
         </span>
         {{ toggleLabel }}

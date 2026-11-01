@@ -3,9 +3,9 @@ import { computed, ref } from 'vue'
 import { useScrollIntoView } from '@/composables/useScrollIntoView'
 import { useHorsesStore } from '@/stores/horses'
 import { useRaceStore } from '@/stores/race'
-import type { Lap } from '@/types/race'
+import { RaceStatus, type Lap, type LapRow, type LapState } from '@/types'
 import BasePanel from './BasePanel.vue'
-import LapTable, { type LapRow, type LapState } from './LapTable.vue'
+import LapTable from './LapTable.vue'
 
 const horsesStore = useHorsesStore()
 const race = useRaceStore()
@@ -13,7 +13,9 @@ const body = ref<HTMLElement | null>(null)
 
 function lapState(index: number): LapState {
   if (index < race.results.length) return 'done'
-  if (index === race.lapIndex && ['running', 'paused'].includes(race.status)) return 'active'
+  if (index === race.lapIndex && [RaceStatus.Running, RaceStatus.Paused].includes(race.status)) {
+    return 'active'
+  }
   return 'upcoming'
 }
 

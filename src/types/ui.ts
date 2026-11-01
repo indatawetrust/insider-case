@@ -15,3 +15,4 @@ export interface HorseIconProps {
   height?: number | string
   galloping?: boolean
 }
+
