@@ -6,12 +6,18 @@ import { useRaceAudio } from '@/composables/useRaceAudio'
 import { useTheme } from '@/composables/useTheme'
 import { useRaceStore } from '@/stores/race'
 import { RaceStatus } from '@/types'
+import { scrollToTop } from '@/utils/scroll'
 import HorseIcon from './HorseIcon.vue'
 
 const race = useRaceStore()
 const { isDark, toggleTheme } = useTheme()
 const { muted: isMuted, toggle: toggleAudio } = useRaceAudio()
 const { canInstall, install: installPwa } = usePwaInstall()
+
+function onGenerate() {
+  race.generateProgram()
+  scrollToTop()
+}
 
 const toggleLabel = computed(() => {
   if (race.status === RaceStatus.Running) return 'Pause'
@@ -128,12 +134,7 @@ const segments = computed(() =>
     </div>
 
     <div class="actions">
-      <button
-        type="button"
-        class="btn"
-        :disabled="!race.canGenerate"
-        @click="race.generateProgram()"
-      >
+      <button type="button" class="btn" :disabled="!race.canGenerate" @click="onGenerate">
         Generate Program
       </button>
       <button

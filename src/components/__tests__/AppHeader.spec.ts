@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia, type Pinia } from 'pinia'
 import { useRaceStore } from '@/stores/race'
@@ -29,11 +29,15 @@ describe('AppHeader', () => {
     expect(toggle.text()).toBe('Start')
   })
 
-  it('walks through Start → Pause → Resume', async () => {
+  it('walks through Start → Pause → Resume and scrolls to top on generate', async () => {
+    const scrollToSpy = vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
+    Object.defineProperty(window, 'scrollY', { value: 200, writable: true })
+
     const wrapper = mountHeader()
     const { generate, toggle } = buttons(wrapper)
 
     await generate.trigger('click')
+    expect(scrollToSpy).toHaveBeenCalledWith({ top: 0, behavior: 'smooth' })
     expect(wrapper.text()).toContain('Program ready')
 
     await toggle.trigger('click')

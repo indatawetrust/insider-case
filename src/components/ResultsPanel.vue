@@ -88,6 +88,7 @@ function printResults() {
   color: var(--color-text);
   font-size: 0.78rem;
   font-weight: 600;
+  text-decoration: none;
   cursor: pointer;
   transition:
     background-color 0.15s,
@@ -113,23 +114,24 @@ function printResults() {
 @media print {
   .print-document-header {
     display: block;
-    margin-bottom: 1.25rem;
-    padding-bottom: 0.75rem;
-    border-bottom: 2px solid #111;
+    margin-bottom: 2.5mm;
+    padding-bottom: 1.5mm;
+    border-bottom: 1.5px solid #111;
   }
 
   .print-doc-title {
     font-family: var(--font-display, sans-serif);
-    font-size: 20pt;
-    font-weight: 700;
-    letter-spacing: 0.05em;
+    font-size: 11pt;
+    font-weight: 800;
+    letter-spacing: 0.04em;
     color: #000;
-    line-height: 1.1;
+    line-height: 1;
+    text-transform: uppercase;
   }
 
   .print-doc-subtitle {
-    margin-top: 0.25rem;
-    font-size: 10pt;
+    margin-top: 1.5px;
+    font-size: 6.8pt;
     color: #444;
   }
 }

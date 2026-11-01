@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { LAP_DISTANCES } from '@/constants/game'
 import { useRaceStore } from '@/stores/race'
 import { RaceStatus } from '@/types'
 import { formatRaceTime, ordinal } from '@/utils/format'
+import { scrollToTop } from '@/utils/scroll'
 import HorseIcon from './HorseIcon.vue'
 
 const race = useRaceStore()
@@ -20,12 +21,18 @@ const showGo = computed(
     race.elapsedMs >= 0 &&
     race.elapsedMs < GO_MS,
 )
+
+watch(showGo, (active) => {
+  if (active) {
+    scrollToTop()
+  }
+})
 const markers = computed(() =>
   lap.value ? MARKERS.map((share) => ({ share, meters: lap.value!.distance * share })) : [],
 )
 
 const winner = computed(() => {
-  const latest = race.results.at(-1)
+  const latest = race.results[race.results.length - 1]
   if (!race.lapComplete || !latest || latest.lapNumber !== lap.value?.number) return null
   const first = latest.placements[0]
   const lane = race.lanes.find((l) => l.horse.id === first?.horseId)
