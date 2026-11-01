@@ -15,8 +15,11 @@ describe('AppHeader', () => {
 
   const mountHeader = () => mount(AppHeader, { global: { plugins: [pinia] } })
   const buttons = (wrapper: ReturnType<typeof mountHeader>) => {
-    const [generate, toggle] = wrapper.findAll('button')
-    return { generate: generate!, toggle: toggle! }
+    const audio = wrapper.find('[data-testid="audio-toggle"]')
+    const theme = wrapper.find('[data-testid="theme-toggle"]')
+    const generate = wrapper.findAll('button').find((b) => b.text().includes('Generate Program'))!
+    const toggle = wrapper.find('button.toggle')
+    return { audio, theme, generate, toggle }
   }
 
   it('only allows generating before a program exists', () => {
@@ -41,5 +44,19 @@ describe('AppHeader', () => {
     await toggle.trigger('click')
     expect(toggle.text()).toBe('Resume')
     expect(useRaceStore().status).toBe(RaceStatus.Paused)
+  })
+
+  it('toggles audio and theme via header action buttons', async () => {
+    const wrapper = mountHeader()
+    const { audio, theme } = buttons(wrapper)
+
+    expect(audio.exists()).toBe(true)
+    expect(theme.exists()).toBe(true)
+
+    await audio.trigger('click')
+    expect(audio.attributes('aria-label')).toBe('Unmute sounds')
+
+    await theme.trigger('click')
+    expect(document.documentElement.classList.contains('dark')).toBe(true)
   })
 })

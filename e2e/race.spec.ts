@@ -111,3 +111,30 @@ test('persists stable, program and lap results across page reload', async ({ pag
   await expect(resultLaps).toHaveCount(1)
   await expect(toggle).toHaveText('Resume')
 })
+
+test('toggles dark mode theme and persists preference', async ({ page }) => {
+  const themeToggle = page.getByTestId('theme-toggle')
+  await expect(page.locator('html')).not.toHaveClass(/dark/)
+
+  await themeToggle.click()
+  await expect(page.locator('html')).toHaveClass(/dark/)
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
+
+  await page.reload()
+  await expect(page.locator('html')).toHaveClass(/dark/)
+
+  await themeToggle.click()
+  await expect(page.locator('html')).not.toHaveClass(/dark/)
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light')
+})
+
+test('toggles sound mute and persists preference', async ({ page }) => {
+  const audioToggle = page.getByTestId('audio-toggle')
+  await expect(audioToggle).toHaveAttribute('aria-label', 'Mute sounds')
+
+  await audioToggle.click()
+  await expect(audioToggle).toHaveAttribute('aria-label', 'Unmute sounds')
+
+  await page.reload()
+  await expect(audioToggle).toHaveAttribute('aria-label', 'Unmute sounds')
+})

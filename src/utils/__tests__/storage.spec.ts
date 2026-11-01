@@ -38,4 +38,3 @@ describe('storage utils', () => {
     expect(loadFromStorage('test_key', null)).toBeNull()
   })
 })
-

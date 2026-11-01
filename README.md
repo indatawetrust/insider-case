@@ -75,13 +75,16 @@ src/
 │   ├── schedule.ts          6-lap program generation
 │   ├── race.ts              Speed, progress curve, lap length, ranking
 │   ├── format.ts            Race time and ordinal formatting
-│   └── storage.ts           Safe localStorage persistence wrapper
+│   ├── storage.ts           Safe localStorage persistence wrapper
+│   └── audio.ts             Web Audio API synthesis: countdown, bell, gallop, fanfare
 ├── stores/                  Pinia, setup-style
 │   ├── horses.ts            The stable (persisted in localStorage)
 │   └── race.ts              Program, status, race clock, results (persisted)
 ├── composables/
 │   ├── useRaceLoop.ts       requestAnimationFrame → race.tick(delta)
-│   └── useScrollIntoView.ts Follows the live lap / newest result
+│   ├── useScrollIntoView.ts Follows the live lap / newest result
+│   ├── useTheme.ts          Reactive dark/light theme composable with system detection
+│   └── useRaceAudio.ts      Coordinates race state with synthesized sound effects
 └── components/
     ├── AppHeader.vue        Title, status, lap meter, Generate / Start-Pause
     ├── HorseList.vue        Horse table
@@ -209,10 +212,11 @@ npm run build
 - **Program positions** are gate (lane) numbers. **Result positions** are finishing places.
 - **Horse names** are computing pioneers, following the example in the brief.
 - **Session persistence**: The stable of 20 horses, generated 6-lap program, completed results, and race clock are persisted in `localStorage`. Reloading or closing the tab preserves the session; mid-race reloads resume cleanly in a paused state.
+- **Dark theme**: First-class dark mode support with automatic system preference detection (`prefers-color-scheme`), explicit manual toggle, and persistence.
+- **Audio synthesis**: Procedural racecourse sound effects built on the Web Audio API (zero audio file dependencies) featuring countdown alerts, race start bell, turf galloping soundscape, and photo-finish fanfare, complete with mute controls.
 
 ## Possible improvements
 
 - Speed control (1×, 2×, 4×) on top of the existing race clock.
 - Accumulated standings and championship points across the 6 laps.
-- Audio cues (start bell, galloping soundscape, photo-finish horn).
-- Dark theme.
+- Betting and bankroll simulation mode.

@@ -4,9 +4,13 @@ import HorseList from './components/HorseList.vue'
 import ProgramPanel from './components/ProgramPanel.vue'
 import RaceTrack from './components/RaceTrack.vue'
 import ResultsPanel from './components/ResultsPanel.vue'
+import { useRaceAudio } from './composables/useRaceAudio'
 import { useRaceLoop } from './composables/useRaceLoop'
+import { useTheme } from './composables/useTheme'
 
+useTheme()
 useRaceLoop()
+useRaceAudio()
 </script>
 
 <template>

@@ -1,6 +1,8 @@
 export const STORAGE_KEYS = {
   HORSES: 'horse-racing:horses',
   RACE: 'horse-racing:race',
+  THEME: 'horse-racing:theme',
+  SOUND: 'horse-racing:sound',
 } as const
 
 function getStorage(): Storage | null {
@@ -56,4 +58,3 @@ export function removeFromStorage(key: string): void {
     // ignore
   }
 }
-
