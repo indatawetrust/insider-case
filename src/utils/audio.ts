@@ -54,16 +54,18 @@ export function playCountdownTick(step: number): void {
   const gain = ctx.createGain()
 
   osc.type = 'sine'
-  osc.frequency.setValueAtTime(step === 1 ? 784 : 523.25, now)
+  // Step 3 -> 523.25 Hz (C5), Step 2 -> 659.25 Hz (E5), Step 1 -> 783.99 Hz (G5)
+  const pitch = step === 1 ? 783.99 : step === 2 ? 659.25 : 523.25
+  osc.frequency.setValueAtTime(pitch, now)
 
-  gain.gain.setValueAtTime(0.2, now)
-  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08)
+  gain.gain.setValueAtTime(0.25, now)
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09)
 
   osc.connect(gain)
   gain.connect(ctx.destination)
 
   osc.start(now)
-  osc.stop(now + 0.08)
+  osc.stop(now + 0.09)
 }
 
 /** Plays the racecourse start brass bell when the gates open. */

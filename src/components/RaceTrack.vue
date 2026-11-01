@@ -129,7 +129,7 @@ const CONFETTI = Array.from({ length: 36 }, (_, i) => ({
 
       <div v-if="lap" class="finish-line" aria-hidden="true"></div>
 
-      <Transition name="count" mode="out-in">
+      <Transition name="count">
         <div v-if="race.countdown" :key="race.countdown" class="overlay count">
           {{ race.countdown }}
         </div>
@@ -476,27 +476,43 @@ const CONFETTI = Array.from({ length: 36 }, (_, i) => ({
 
 .overlay.go {
   color: #ffd166;
+  text-shadow:
+    0 4px 24px rgb(255 209 102 / 50%),
+    0 6px 30px rgb(0 0 0 / 60%);
+  font-weight: 800;
+  letter-spacing: 0.04em;
 }
 
 .count-enter-active {
-  animation: count-in 0.35s var(--ease-spring);
+  animation: count-in 0.22s cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }
 
 .count-leave-active {
-  animation: count-out 0.15s ease-in forwards;
+  animation: count-out 0.1s ease-in forwards;
 }
 
 @keyframes count-in {
-  from {
+  0% {
     opacity: 0;
-    transform: scale(2.2);
+    transform: scale(1.45);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
 @keyframes count-out {
-  to {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
     opacity: 0;
-    transform: scale(0.6);
+    transform: scale(0.7);
   }
 }
 
