@@ -12,21 +12,36 @@ import {
   toggleSound,
 } from '@/utils/audio'
 
-export function useRaceAudio() {
-  const race = useRaceStore()
-  const muted = ref(isSoundMuted())
+// Shared module-scoped reactive state so all components stay in sync
+const muted = ref(isSoundMuted())
+let currentRaceStore: ReturnType<typeof useRaceStore> | null = null
+let stopWatchers: (() => void) | null = null
 
-  function toggle() {
-    muted.value = toggleSound()
+function initAudioWatchers(race: ReturnType<typeof useRaceStore>) {
+  if (currentRaceStore === race) return
+  if (stopWatchers) {
+    stopWatchers()
+    stopWatchers = null
   }
+  currentRaceStore = race
 
-  function setMuted(val: boolean) {
-    muted.value = val
-    setSoundMuted(val)
-  }
+  // Continuous galloping soundscape:
+  // Re-evaluates whenever mute status, race status, countdown, or lap completion changes.
+  // This ensures that unmuting while a race is running immediately resumes the galloping sound!
+  const unwatchLoop = watch(
+    () => [muted.value, race.status, race.countdown, race.lapComplete] as const,
+    ([isMutedVal, status, countdown, lapComplete]) => {
+      if (!isMutedVal && status === RaceStatus.Running && countdown === 0 && !lapComplete) {
+        startGalloping()
+      } else {
+        stopGalloping()
+      }
+    },
+    { immediate: true, flush: 'sync' },
+  )
 
-  // Watch countdown steps
-  watch(
+  // One-off countdown ticks & start bell
+  const unwatchCountdown = watch(
     () => race.countdown,
     (val, oldVal) => {
       if (val > 0 && val !== oldVal) {
@@ -38,33 +53,42 @@ export function useRaceAudio() {
         race.status === RaceStatus.Running
       ) {
         playStartBell()
-        startGalloping()
       }
     },
+    { flush: 'sync' },
   )
 
-  // Watch running state for galloping soundscape
-  watch(
-    () => race.status,
-    (status) => {
-      if (status === RaceStatus.Running && race.countdown === 0) {
-        startGalloping()
-      } else {
-        stopGalloping()
-      }
-    },
-  )
-
-  // Watch lap completions for fanfare
-  watch(
+  // One-off lap completion fanfare
+  const unwatchResults = watch(
     () => race.results.length,
     (newCount, oldCount) => {
       if (newCount > (oldCount ?? 0)) {
-        stopGalloping()
         playFinishFanfare()
       }
     },
+    { flush: 'sync' },
   )
+
+  stopWatchers = () => {
+    unwatchLoop()
+    unwatchCountdown()
+    unwatchResults()
+  }
+}
+
+export function useRaceAudio() {
+  const race = useRaceStore()
+
+  initAudioWatchers(race)
+
+  function toggle() {
+    muted.value = toggleSound()
+  }
+
+  function setMuted(val: boolean) {
+    muted.value = val
+    setSoundMuted(val)
+  }
 
   if (getCurrentInstance()) {
     onBeforeUnmount(() => {

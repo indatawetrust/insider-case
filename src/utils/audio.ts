@@ -140,6 +140,11 @@ export function stopGalloping(): void {
   }
 }
 
+/** Returns whether the galloping sound loop is currently active. */
+export function isGalloping(): boolean {
+  return gallopTimer !== null
+}
+
 /** Plays a victorious chime when a lap/race finishes. */
 export function playFinishFanfare(): void {
   if (isMuted) return

@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import {
+  isGalloping,
   isSoundMuted,
   playCountdownTick,
   playFinishFanfare,
@@ -11,10 +12,38 @@ import {
 } from '../audio'
 import { STORAGE_KEYS } from '../storage'
 
+class MockAudioContext {
+  currentTime = 0
+  state = 'running'
+  createOscillator() {
+    return {
+      type: 'sine',
+      frequency: { setValueAtTime: () => {}, exponentialRampToValueAtTime: () => {} },
+      connect: () => {},
+      start: () => {},
+      stop: () => {},
+    }
+  }
+  createGain() {
+    return {
+      gain: { setValueAtTime: () => {}, exponentialRampToValueAtTime: () => {} },
+      connect: () => {},
+    }
+  }
+  resume() {
+    return Promise.resolve()
+  }
+  destination = {}
+}
+
 describe('audio synthesis utilities', () => {
   beforeEach(() => {
     localStorage.clear()
     setSoundMuted(false)
+    stopGalloping()
+  })
+
+  afterEach(() => {
     stopGalloping()
   })
 
@@ -42,9 +71,29 @@ describe('audio synthesis utilities', () => {
     }).not.toThrow()
   })
 
-  it('stops galloping when muted', () => {
-    startGalloping()
-    setSoundMuted(true)
-    expect(isSoundMuted()).toBe(true)
+  it('starts and stops galloping sound loop with AudioContext', () => {
+    // Provide Mock AudioContext on window
+    const originalAudioContext = window.AudioContext
+    window.AudioContext = MockAudioContext as unknown as typeof AudioContext
+
+    try {
+      expect(isGalloping()).toBe(false)
+      startGalloping()
+      expect(isGalloping()).toBe(true)
+
+      // Muting stops galloping immediately
+      setSoundMuted(true)
+      expect(isGalloping()).toBe(false)
+
+      // When unmuting, galloping can be restarted
+      setSoundMuted(false)
+      startGalloping()
+      expect(isGalloping()).toBe(true)
+
+      stopGalloping()
+      expect(isGalloping()).toBe(false)
+    } finally {
+      window.AudioContext = originalAudioContext
+    }
   })
 })
