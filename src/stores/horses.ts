@@ -1,6 +1,7 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { HORSE_COUNT } from '@/constants/game'
+import { HORSE_COLORS } from '@/data/horses'
 import type { Horse } from '@/types/horse'
 import { generateHorses } from '@/utils/horses'
 import type { RandomFn } from '@/utils/random'
@@ -21,8 +22,13 @@ export const useHorsesStore = defineStore('horses', () => {
     return byId.value.get(id)
   }
 
+  const validHexes = new Set(HORSE_COLORS.map((c) => c.hex))
   const cached = loadFromStorage<Horse[] | null>(STORAGE_KEYS.HORSES, null)
-  if (Array.isArray(cached) && cached.length === HORSE_COUNT) {
+  if (
+    Array.isArray(cached) &&
+    cached.length === HORSE_COUNT &&
+    cached.every((h) => validHexes.has(h.color.hex))
+  ) {
     horses.value = cached
   } else {
     generate()

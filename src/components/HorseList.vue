@@ -144,15 +144,15 @@ tr.benched {
 }
 
 .fill.low {
-  background: #e5533d;
+  background: #e26d5c;
 }
 
 .fill.mid {
-  background: #f2b705;
+  background: #ebb340;
 }
 
 .fill.high {
-  background: #2f9e5b;
+  background: #45ab6d;
 }
 
 @keyframes fill {
