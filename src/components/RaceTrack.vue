@@ -368,8 +368,9 @@ const CONFETTI = Array.from({ length: 36 }, (_, i) => ({
   height: 24px;
   margin-top: -12px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--color-surface);
   color: var(--color-text);
+  border: 1px solid var(--color-border);
   font-weight: 800;
   font-size: 0.75rem;
   box-shadow: 0 2px 6px rgb(0 0 0 / 30%);
@@ -378,15 +379,20 @@ const CONFETTI = Array.from({ length: 36 }, (_, i) => ({
 
 .place-1 {
   background: var(--color-gold);
+  color: #1a1a1e;
+  border-color: transparent;
 }
 
 .place-2 {
   background: var(--color-silver);
+  color: #1a1a1e;
+  border-color: transparent;
 }
 
 .place-3 {
   background: var(--color-bronze);
   color: #fff;
+  border-color: transparent;
 }
 
 /* Drawn over the turf but under the runners (z-index 2). */
@@ -502,7 +508,9 @@ const CONFETTI = Array.from({ length: 36 }, (_, i) => ({
   gap: 0.75rem;
   padding: 0.75rem 1.2rem;
   border-radius: 999px;
-  background: rgb(255 255 255 / 96%);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   box-shadow: 0 10px 40px rgb(0 0 0 / 35%);
   white-space: nowrap;
   translate: -50% -50%;
@@ -517,6 +525,8 @@ const CONFETTI = Array.from({ length: 36 }, (_, i) => ({
   padding: 0.15rem 0.5rem;
   border-radius: 6px;
   background: var(--color-surface-muted);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
