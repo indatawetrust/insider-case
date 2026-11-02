@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils'
 import HorseIcon from '../HorseIcon.vue'
 
 describe('HorseIcon', () => {
-  it('renders SVG with the given coat color', () => {
+  it('renders SVG with the given coat color and default size styles', () => {
     const wrapper = mount(HorseIcon, {
       props: { color: '#E53935' },
     })
@@ -11,6 +11,8 @@ describe('HorseIcon', () => {
     const svg = wrapper.find('svg')
     expect(svg.exists()).toBe(true)
     expect(svg.attributes('style')).toContain('--coat: #E53935')
+    expect(svg.attributes('style')).toContain('width: 100%')
+    expect(svg.attributes('style')).toContain('height: auto')
     expect(svg.classes()).toContain('horse-icon')
     expect(svg.classes()).not.toContain('galloping')
   })
@@ -31,22 +33,31 @@ describe('HorseIcon', () => {
     expect(spritePath.length).toBeGreaterThan(idlePath.length * 5)
   })
 
-  it('applies custom size via props', () => {
-    const wrapper = mount(HorseIcon, {
+  it('applies custom size via props (both number and string)', () => {
+    const numWrapper = mount(HorseIcon, {
       props: { color: '#ffffff', size: 24 },
     })
+    expect(numWrapper.find('svg').attributes('style')).toContain('width: 24px')
 
-    const style = wrapper.find('svg').attributes('style')
-    expect(style).toContain('width: 24px')
+    const strWrapper = mount(HorseIcon, {
+      props: { color: '#ffffff', size: '2.5rem' },
+    })
+    expect(strWrapper.find('svg').attributes('style')).toContain('width: 2.5rem')
   })
 
-  it('supports explicit width and height props', () => {
-    const wrapper = mount(HorseIcon, {
+  it('supports explicit width and height props (both number and string)', () => {
+    const numWrapper = mount(HorseIcon, {
       props: { color: '#123456', width: 40, height: 30 },
     })
+    const numStyle = numWrapper.find('svg').attributes('style')
+    expect(numStyle).toContain('width: 40px')
+    expect(numStyle).toContain('height: 30px')
 
-    const style = wrapper.find('svg').attributes('style')
-    expect(style).toContain('width: 40px')
-    expect(style).toContain('height: 30px')
+    const strWrapper = mount(HorseIcon, {
+      props: { color: '#123456', width: '50px', height: '40px' },
+    })
+    const strStyle = strWrapper.find('svg').attributes('style')
+    expect(strStyle).toContain('width: 50px')
+    expect(strStyle).toContain('height: 40px')
   })
 })

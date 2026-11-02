@@ -12,8 +12,16 @@ export default mergeConfig(
       coverage: {
         provider: 'v8',
         reporter: ['text', 'html', 'json-summary'],
-        include: ['src/**/*'],
-        exclude: ['src/**/__tests__/**', 'src/**/*.d.ts', 'src/main.ts'],
+        include: ['src/**/*.{ts,vue}'],
+        exclude: [
+          'src/**/__tests__/**',
+          'src/**/*.d.ts',
+          'src/main.ts',
+          'src/assets/**',
+          'src/types/horse.ts',
+          'src/types/ui.ts',
+          'src/types/index.ts',
+        ],
       },
     },
   }),

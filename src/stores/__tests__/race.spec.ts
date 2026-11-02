@@ -123,6 +123,16 @@ describe('race store', () => {
     expect(rehydratedStore.canToggle).toBe(true)
   })
 
+  it('identifies leader during mid-race before any runner finishes and handles idle race without leader', () => {
+    expect(store.leader).toBeNull()
+
+    store.generateProgram(createRandom(1))
+    store.start()
+    advance(store, COUNTDOWN_MS + 2000)
+    expect(store.leader).not.toBeNull()
+    expect(store.leader?.progress).toBeGreaterThan(0)
+  })
+
   it('resets state and clears storage on reset()', () => {
     store.generateProgram(createRandom(1))
     expect(localStorage.getItem(STORAGE_KEYS.RACE)).toBeTruthy()

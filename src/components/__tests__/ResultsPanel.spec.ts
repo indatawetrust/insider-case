@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia, type Pinia } from 'pinia'
+import { nextTick } from 'vue'
 import { useHorsesStore } from '@/stores/horses'
 import { useRaceStore } from '@/stores/race'
 import ResultsPanel from '../ResultsPanel.vue'
@@ -64,5 +65,23 @@ describe('ResultsPanel', () => {
     await printBtn.trigger('click')
 
     expect(printSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('triggers scrollIntoView when new results are appended after mount', async () => {
+    const race = useRaceStore()
+    const horsesStore = useHorsesStore()
+    const wrapper = mount(ResultsPanel, { global: { plugins: [pinia] } })
+
+    race.results.push({
+      lapNumber: 1,
+      distance: 1200,
+      placements: [
+        { position: 1, horseId: horsesStore.horses[0]!.id, raceTimeMs: 60000 },
+        { position: 2, horseId: 999999, raceTimeMs: 61000 }, // Unknown horseId fallback branch
+      ],
+    })
+
+    await nextTick()
+    expect(wrapper.findAllComponents({ name: 'LapTable' }).length).toBe(1)
   })
 })

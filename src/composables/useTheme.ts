@@ -70,3 +70,10 @@ export function useTheme() {
     toggleTheme,
   }
 }
+
+/** Internal reset helper for test isolation. */
+export function _resetTheme(): void {
+  initialized = false
+  themeMode.value = 'system'
+  systemIsDark.value = false
+}

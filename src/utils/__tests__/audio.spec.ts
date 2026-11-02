@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import {
+  _resetAudioContext,
   isGalloping,
   isSoundMuted,
   playCountdownTick,
@@ -36,15 +37,25 @@ class MockAudioContext {
   destination = {}
 }
 
+class SuspendedAudioContext extends MockAudioContext {
+  override state = 'suspended'
+}
+
 describe('audio synthesis utilities', () => {
+  let originalAudioContext: typeof window.AudioContext
+
   beforeEach(() => {
     localStorage.clear()
     setSoundMuted(false)
     stopGalloping()
+    _resetAudioContext()
+    originalAudioContext = window.AudioContext
   })
 
   afterEach(() => {
     stopGalloping()
+    _resetAudioContext()
+    window.AudioContext = originalAudioContext
   })
 
   it('manages sound mute state and persists to storage', () => {
@@ -71,29 +82,62 @@ describe('audio synthesis utilities', () => {
     }).not.toThrow()
   })
 
-  it('starts and stops galloping sound loop with AudioContext', () => {
-    // Provide Mock AudioContext on window
-    const originalAudioContext = window.AudioContext
+  it('plays sounds and fanfares when AudioContext is available', () => {
     window.AudioContext = MockAudioContext as unknown as typeof AudioContext
 
-    try {
-      expect(isGalloping()).toBe(false)
-      startGalloping()
-      expect(isGalloping()).toBe(true)
+    expect(() => {
+      playCountdownTick(3)
+      playCountdownTick(1)
+      playStartBell()
+      playFinishFanfare()
+    }).not.toThrow()
+  })
 
-      // Muting stops galloping immediately
-      setSoundMuted(true)
-      expect(isGalloping()).toBe(false)
+  it('resumes suspended audio context', () => {
+    _resetAudioContext()
+    window.AudioContext = SuspendedAudioContext as unknown as typeof AudioContext
 
-      // When unmuting, galloping can be restarted
-      setSoundMuted(false)
-      startGalloping()
-      expect(isGalloping()).toBe(true)
+    expect(() => {
+      playCountdownTick(3)
+    }).not.toThrow()
+  })
 
-      stopGalloping()
-      expect(isGalloping()).toBe(false)
-    } finally {
-      window.AudioContext = originalAudioContext
+  it('handles AudioContext constructor error safely', () => {
+    _resetAudioContext()
+    class FailingAudioContext {
+      constructor() {
+        throw new Error('AudioContext blocked by autoplay policy')
+      }
     }
+    window.AudioContext = FailingAudioContext as unknown as typeof AudioContext
+
+    expect(() => {
+      playCountdownTick(3)
+      playFinishFanfare()
+    }).not.toThrow()
+  })
+
+  it('starts and stops galloping sound loop with AudioContext', () => {
+    window.AudioContext = MockAudioContext as unknown as typeof AudioContext
+
+    expect(isGalloping()).toBe(false)
+    startGalloping()
+    expect(isGalloping()).toBe(true)
+
+    // Calling startGalloping again when already galloping is a no-op
+    startGalloping()
+    expect(isGalloping()).toBe(true)
+
+    // Muting stops galloping immediately
+    setSoundMuted(true)
+    expect(isGalloping()).toBe(false)
+
+    // When unmuting, galloping can be restarted
+    setSoundMuted(false)
+    startGalloping()
+    expect(isGalloping()).toBe(true)
+
+    stopGalloping()
+    expect(isGalloping()).toBe(false)
   })
 })

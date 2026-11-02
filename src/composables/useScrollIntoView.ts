@@ -13,6 +13,6 @@ export function useScrollIntoView(
     await nextTick()
     container.value
       ?.querySelector(selector())
-      ?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      ?.scrollIntoView?.({ behavior: 'smooth', block: 'nearest' })
   })
 }

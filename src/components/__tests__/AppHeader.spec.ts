@@ -63,4 +63,31 @@ describe('AppHeader', () => {
     await theme.trigger('click')
     expect(document.documentElement.classList.contains('dark')).toBe(true)
   })
+
+  it('displays "All laps complete" when race status is finished', () => {
+    const race = useRaceStore()
+    race.status = RaceStatus.Finished
+    const wrapper = mountHeader()
+    expect(wrapper.text()).toContain('All laps complete')
+  })
+
+  it('handles PWA installation prompt trigger', async () => {
+    const wrapper = mountHeader()
+    const promptEvent = new Event('beforeinstallprompt') as Event & {
+      prompt: () => Promise<void>
+      userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
+    }
+    const promptMock = vi.fn<() => Promise<void>>().mockResolvedValue(undefined)
+    promptEvent.prompt = promptMock
+    promptEvent.userChoice = Promise.resolve({ outcome: 'accepted', platform: 'web' })
+
+    window.dispatchEvent(promptEvent)
+    await wrapper.vm.$nextTick()
+
+    const installBtn = wrapper.find('[data-testid="pwa-install"]')
+    expect(installBtn.exists()).toBe(true)
+
+    await installBtn.trigger('click')
+    expect(promptMock).toHaveBeenCalledTimes(1)
+  })
 })

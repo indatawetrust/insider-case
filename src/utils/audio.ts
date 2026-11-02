@@ -174,3 +174,8 @@ export function playFinishFanfare(): void {
     osc.stop(noteTime + 0.7)
   })
 }
+
+/** Test isolation helper to clear singleton audio context. */
+export function _resetAudioContext(): void {
+  audioCtx = null
+}

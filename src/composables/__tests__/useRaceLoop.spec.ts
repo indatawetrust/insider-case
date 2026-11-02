@@ -23,6 +23,42 @@ describe('useRaceLoop', () => {
     vi.restoreAllMocks()
   })
 
+  it('drives animation frames with requestAnimationFrame when running', async () => {
+    let rafCallback: FrameRequestCallback | null = null
+    let rafId = 0
+    vi.spyOn(window, 'requestAnimationFrame').mockImplementation((cb) => {
+      rafCallback = cb
+      return ++rafId
+    })
+    const cancelRafSpy = vi.spyOn(window, 'cancelAnimationFrame').mockImplementation(() => {})
+
+    const race = useRaceStore()
+    const tickSpy = vi.spyOn(race, 'tick')
+
+    const wrapper = mount(TestComponent)
+
+    // Trigger running state
+    race.status = RaceStatus.Running
+    await wrapper.vm.$nextTick()
+
+    expect(rafCallback).toBeDefined()
+
+    // Step 1: lastTime is null, tick is not called yet
+    rafCallback!(1000)
+    expect(tickSpy).not.toHaveBeenCalled()
+
+    // Step 2: lastTime is 1000, now tick is called with delta
+    rafCallback!(1016)
+    expect(tickSpy).toHaveBeenCalledWith(16)
+
+    // Pause stops the loop
+    race.status = RaceStatus.Paused
+    await wrapper.vm.$nextTick()
+    expect(cancelRafSpy).toHaveBeenCalled()
+
+    wrapper.unmount()
+  })
+
   it('pauses the running race when tab becomes hidden (visibilitychange)', async () => {
     const race = useRaceStore()
     const pauseSpy = vi.spyOn(race, 'pause')

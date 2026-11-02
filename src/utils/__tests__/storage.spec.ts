@@ -1,13 +1,15 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { loadFromStorage, removeFromStorage, saveToStorage, STORAGE_KEYS } from '../storage'
 
 describe('storage utils', () => {
   beforeEach(() => {
     localStorage.clear()
+    vi.restoreAllMocks()
   })
 
   afterEach(() => {
     localStorage.clear()
+    vi.restoreAllMocks()
   })
 
   it('saves and loads data from localStorage', () => {
@@ -36,5 +38,41 @@ describe('storage utils', () => {
 
     removeFromStorage('test_key')
     expect(loadFromStorage('test_key', null)).toBeNull()
+  })
+
+  it('returns false when saveToStorage fails (e.g. QuotaExceededError)', () => {
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('QuotaExceededError')
+    })
+
+    const result = saveToStorage('overflow_key', { data: 'test' })
+    expect(result).toBe(false)
+  })
+
+  it('handles inaccessible localStorage gracefully', () => {
+    const originalLocalStorage = window.localStorage
+    Object.defineProperty(window, 'localStorage', {
+      get() {
+        throw new Error('SecurityError: Access is denied')
+      },
+      configurable: true,
+    })
+
+    expect(loadFromStorage('any_key', 'fallback')).toBe('fallback')
+    expect(saveToStorage('any_key', 'value')).toBe(false)
+    expect(() => removeFromStorage('any_key')).not.toThrow()
+
+    Object.defineProperty(window, 'localStorage', {
+      value: originalLocalStorage,
+      configurable: true,
+    })
+  })
+
+  it('handles removeItem errors gracefully', () => {
+    vi.spyOn(Storage.prototype, 'removeItem').mockImplementation(() => {
+      throw new Error('Failed to remove')
+    })
+
+    expect(() => removeFromStorage('any_key')).not.toThrow()
   })
 })

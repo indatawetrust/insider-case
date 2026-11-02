@@ -23,6 +23,14 @@ describe('usePwaInstall', () => {
     const wrapper = mount(TestComponent)
     expect(wrapper.vm.canInstall).toBe(false)
     expect(wrapper.vm.isInstalled).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('returns false when install is called without an active prompt', async () => {
+    const wrapper = mount(TestComponent)
+    const result = await wrapper.vm.install()
+    expect(result).toBe(false)
+    wrapper.unmount()
   })
 
   it('updates canInstall when beforeinstallprompt is fired', async () => {
@@ -38,6 +46,7 @@ describe('usePwaInstall', () => {
     await wrapper.vm.$nextTick()
 
     expect(wrapper.vm.canInstall).toBe(true)
+    wrapper.unmount()
   })
 
   it('prompts the user when install is called', async () => {
@@ -57,6 +66,7 @@ describe('usePwaInstall', () => {
     expect(mockPrompt).toHaveBeenCalledTimes(1)
     expect(outcome).toBe(true)
     expect(wrapper.vm.canInstall).toBe(false)
+    wrapper.unmount()
   })
 
   it('handles appinstalled event', async () => {
@@ -66,5 +76,6 @@ describe('usePwaInstall', () => {
 
     expect(wrapper.vm.isInstalled).toBe(true)
     expect(wrapper.vm.canInstall).toBe(false)
+    wrapper.unmount()
   })
 })

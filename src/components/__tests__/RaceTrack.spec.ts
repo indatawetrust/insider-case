@@ -62,4 +62,16 @@ describe('RaceTrack', () => {
     expect(banner.text()).toContain('wins the 1st lap')
     expect(banner.find('.banner-time').exists()).toBe(true)
   })
+
+  it('renders celebration confetti when race status is finished', async () => {
+    const race = useRaceStore()
+    race.generateProgram(createRandom(42))
+    race.status = RaceStatus.Finished
+
+    const wrapper = mount(RaceTrack, { global: { plugins: [pinia] } })
+    await nextTick()
+
+    expect(wrapper.find('.confetti').exists()).toBe(true)
+    expect(wrapper.findAll('.confetti span').length).toBeGreaterThan(0)
+  })
 })

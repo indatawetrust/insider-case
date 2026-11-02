@@ -63,4 +63,13 @@ describe('LapTable', () => {
     })
     expect(wrapper.find('.live').exists()).toBe(true)
   })
+
+  it('flags the done lap with completed checkmark', () => {
+    const wrapper = mount(LapTable, {
+      props: { lapNumber: 1, distance: 1200, rows: [], state: 'done' },
+    })
+    const doneMark = wrapper.find('.done-mark')
+    expect(doneMark.exists()).toBe(true)
+    expect(doneMark.text()).toBe('✓')
+  })
 })

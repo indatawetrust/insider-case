@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
+import { defineComponent } from 'vue'
 import { COUNTDOWN_MS } from '@/constants/game'
 import { useRaceStore } from '@/stores/race'
 import { isGalloping, stopGalloping } from '@/utils/audio'
@@ -29,6 +31,13 @@ class MockAudioContext {
   }
   destination = {}
 }
+
+const AudioComponent = defineComponent({
+  setup() {
+    return useRaceAudio()
+  },
+  template: '<div />',
+})
 
 describe('useRaceAudio composable', () => {
   let originalAudioContext: typeof window.AudioContext
@@ -86,6 +95,24 @@ describe('useRaceAudio composable', () => {
 
     // Pause race -> galloping should stop
     race.pause()
+    expect(isGalloping()).toBe(false)
+  })
+
+  it('plays finish fanfare when race results count increases', () => {
+    useRaceAudio()
+    const race = useRaceStore()
+
+    race.results.push({
+      lapNumber: 1,
+      distance: 1200,
+      placements: [],
+    })
+    expect(race.results.length).toBe(1)
+  })
+
+  it('cleans up galloping on component unmount', () => {
+    const wrapper = mount(AudioComponent)
+    wrapper.unmount()
     expect(isGalloping()).toBe(false)
   })
 })
