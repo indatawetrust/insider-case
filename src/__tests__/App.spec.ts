@@ -27,4 +27,3 @@ describe('App root component', () => {
     expect(wrapper.findComponent(ResultsPanel).exists()).toBe(true)
   })
 })
-
