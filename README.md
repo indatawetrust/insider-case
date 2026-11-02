@@ -9,7 +9,7 @@ An interactive horse racing game built with Vue 3, TypeScript and Pinia.
 [![Best Practices: 100](https://img.shields.io/badge/Best%20Practices-100-brightgreen.svg?style=flat-square&logo=lighthouse&logoColor=white)](#lighthouse-scores)
 [![SEO: 100](https://img.shields.io/badge/SEO-100-brightgreen.svg?style=flat-square&logo=lighthouse&logoColor=white)](#lighthouse-scores)
 
-**Live demo:** https://&lt;github-user&gt;.github.io/insider-case/
+**Live demo:** https://indatawetrust.github.io/insider-case/
 
 ![Mid-race screenshot](docs/screenshot.png)
 
