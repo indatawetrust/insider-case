@@ -74,6 +74,25 @@ test('pause freezes the horses and resume carries on', async ({ page }) => {
   )
 })
 
+test('pauses automatically when switching tabs (visibilitychange)', async ({ page }) => {
+  const { generate, toggle, runners } = ui(page)
+  await generate.click()
+  await toggle.click()
+  await page.clock.runFor(3_000)
+  await expect(toggle).toHaveText('Pause')
+
+  // Simulate tab being hidden (user switches tab)
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { value: true, configurable: true })
+    document.dispatchEvent(new Event('visibilitychange'))
+  })
+
+  await expect(toggle).toHaveText('Resume')
+  const frozen = await runners.evaluateAll((els) => els.map((el) => el.dataset.progress))
+  await page.clock.runFor(3_000)
+  expect(await runners.evaluateAll((els) => els.map((el) => el.dataset.progress))).toEqual(frozen)
+})
+
 test('generating again while paused starts a fresh program', async ({ page }) => {
   const { generate, toggle, resultLaps } = ui(page)
   await generate.click()

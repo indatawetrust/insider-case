@@ -17,7 +17,7 @@ An interactive horse racing game built with Vue 3, TypeScript and Pinia.
 
 - **Horse list:** 20 horses, each with a unique color and a condition score between 1 and 100.
 - **Program:** _Generate Program_ draws 6 laps (1200m → 2200m), each with 10 random horses from the stable.
-- **Race:** _Start_ runs the laps one after another. _Pause_ / _Resume_ freezes and continues the race at any moment.
+- **Race:** _Start_ runs the laps one after another. _Pause_ / _Resume_ freezes and continues the race at any moment. Automatically pauses when switching away from the tab.
 - **Results:** each lap's finishing order and race time are posted the moment its last horse crosses the line.
 - **Animations:** galloping horses with leg and tail motion, a 3‑2‑1 countdown, live leader, finish-place badges, a winner banner, lap progress in the header, and confetti when the program ends. All decorative motion respects `prefers-reduced-motion`.
 - **Responsive:** three columns on wide screens, stacked panels on tablets and phones.
@@ -193,15 +193,16 @@ Key optimizations contributing to the scores:
 
 Audited with Google Lighthouse on both **Mobile** (Moto G Power emulation, simulated 4G throttling) and **Desktop** presets against the production build:
 
-| Category | Mobile | Desktop | Status |
-| :--- | :---: | :---: | :---: |
-| **Performance** | **100** | **100** | Pass (Green) |
-| **Accessibility** | **100** | **100** | Pass (Green) |
-| **Best Practices** | **100** | **100** | Pass (Green) |
-| **SEO** | **100** | **100** | Pass (Green) |
+| Category             | Mobile  | Desktop |    Status    |
+| :------------------- | :-----: | :-----: | :----------: |
+| **Performance**      | **100** | **100** | Pass (Green) |
+| **Accessibility**    | **100** | **100** | Pass (Green) |
+| **Best Practices**   | **100** | **100** | Pass (Green) |
+| **SEO**              | **100** | **100** | Pass (Green) |
 | **Agentic Browsing** | **100** | **100** | Pass (Green) |
 
 Key optimizations contributing to the scores:
+
 - **Zero layout shift (CLS = 0.00)** through explicit container dimensions and fixed-ratio track lanes.
 - **Sub-second paint (FCP / LCP < 0.8s)** via self-hosted variable font subsets and lean asset bundles.
 - **Accessible contrast (WCAG AAA)** across light and dark themes, semantic table column scopes (`scope="col"`), and heading structure (`h1` → `h2`).
@@ -259,3 +260,4 @@ npm run build
 - **Session persistence**: The stable of 20 horses, generated 6-lap program, completed results, and race clock are persisted in `localStorage`. Reloading or closing the tab preserves the session; mid-race reloads resume cleanly in a paused state.
 - **Dark theme**: First-class dark mode support with automatic system preference detection (`prefers-color-scheme`), explicit manual toggle, and persistence.
 - **Audio synthesis**: Procedural racecourse sound effects built on the Web Audio API (zero audio file dependencies) featuring countdown alerts, race start bell, turf galloping soundscape, and photo-finish fanfare, complete with mute controls.
+- **Auto-pause on background tab**: The race automatically pauses when leaving the tab or minimizing the browser via the Page Visibility API (`visibilitychange`), pausing both the animation and sound without losing state.
